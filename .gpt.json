@@ -1,4 +1,4 @@
 {
-  "exclude": [".*", "*.md", "package.json", "tsconfig.json"],
+  "exclude": [".*", "*.md", "LICENSE", "package.json", "tsconfig.json"],
   "out": "prompt.txt"
 }

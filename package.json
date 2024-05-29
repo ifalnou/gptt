@@ -1,19 +1,40 @@
 {
   "name": "gptt",
+  "description": "CLI tool for generating GPT prompts for coding projects",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
   "bin": {
     "gptt": "./dist/index.js"
   },
+  "author": "Aurélie Richard <aurelierichard2048@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/ifalnou/gptt",
+  "repository": "github:ifalnou/gptt",
+  "bugs": {
+    "url": "https://github.com/ifalnou/gptt/issues",
+    "email": "aurelierichard2048@gmail.com"
+  },
   "scripts": {
     "build": "tsc && chmod +x dist/index.js",
     "test": "npm run build && ts-mocha"
   },
-  "keywords": ["openai","gpt","gpt-4","chatgpt","cli","command-line","prompt-generation","code-prompt","developer-tools","code-assistant","automation","programming","code-analysis","ai-tools"],
-  "author": "aurelierichard2048@gmail.com",
-  "license": "MIT",
-  "description": "",
+  "keywords": [
+    "openai",
+    "gpt",
+    "gpt-4",
+    "chatgpt",
+    "cli",
+    "command-line",
+    "prompt-generation",
+    "code-prompt",
+    "developer-tools",
+    "code-assistant",
+    "automation",
+    "programming",
+    "code-analysis",
+    "ai-tools"
+  ],
   "dependencies": {
     "commander": "^12.1.0",
     "fs-extra": "^11.2.0",

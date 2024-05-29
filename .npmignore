@@ -1,0 +1,6 @@
+.gpt.json
+.mocharc.json
+src/index.ts
+test/index.test.ts
+tsconfig.json
+*.tgz
