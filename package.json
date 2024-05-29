@@ -5,12 +5,15 @@
   "main": "index.js",
   "type": "module",
   "bin": {
-    "gptt": "./dist/index.js"
+    "gptt": "dist/index.js"
   },
   "author": "Aurélie Richard <aurelierichard2048@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/ifalnou/gptt",
-  "repository": "github:ifalnou/gptt",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ifalnou/gptt.git"
+  },
   "bugs": {
     "url": "https://github.com/ifalnou/gptt/issues",
     "email": "aurelierichard2048@gmail.com"
