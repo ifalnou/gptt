@@ -85,7 +85,7 @@ const generatePrompt = async (userPrompt: string, inputFiles: string[], optional
 
     for (const file of optionalFiles) {
         const filename = path.basename(file);
-        if (prompt.includes(filename)) {
+        if (userPrompt.includes(filename)) {
             prompt += await addFileContent(file);
         }
     }
@@ -110,6 +110,9 @@ const main = async () => {
         const inputFiles = readFiles(finalConfig.in!, finalConfig.exclude!, ig);
         const optionalFiles = readFiles(finalConfig.optional!, finalConfig.exclude!, ig);
         const userPrompt = program.args.join(' ');
+
+        console.log("optionalFiles", inputFiles);
+        console.log("inputFiles", inputFiles);
 
         const finalPrompt = await generatePrompt(userPrompt, inputFiles, optionalFiles);
 

@@ -1,7 +1,7 @@
 {
   "name": "gptt",
   "description": "CLI tool for generating GPT prompts for coding projects",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "index.js",
   "type": "module",
   "bin": {
