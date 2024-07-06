@@ -47,17 +47,18 @@ const readGitignore = async (): Promise<Ignore> => {
     return ig;
 };
 
-const readFiles = (patterns: string[], excludePatterns: string[], ig: Ignore): string[] => {
+const readFiles = async (patterns: string[], excludePatterns: string[], ig: Ignore): Promise<string[]> => {
     let files: string[] = [];
-    patterns.forEach(pattern => {
-        files = files.concat(glob.sync(pattern, { nodir: true }));
-    });
+    const globPromises = patterns.map(pattern => glob(pattern, { nodir: true }));
+
+    const resolvedFiles = await Promise.all(globPromises);
+    files = resolvedFiles.flat();
 
     // Apply exclude patterns
-    excludePatterns.forEach(pattern => {
-        const excludeFiles = glob.sync(pattern, { nodir: true });
-        files = files.filter(file => !excludeFiles.includes(file));
-    });
+    const excludePromises = excludePatterns.map(pattern => glob(pattern, { nodir: true }));
+
+    const excludeFiles = (await Promise.all(excludePromises)).flat();
+    files = files.filter(file => !excludeFiles.includes(file));
 
     return ig.filter(files);
 };
@@ -76,23 +77,27 @@ const addFileContent = async (filePath: string): Promise<string> => {
     return '';
 };
 
-const generatePrompt = async (userPrompt: string, inputFiles: string[], optionalFiles: string[]): Promise<string> => {
+const generatePrompt = async (userPrompt: string, inputFiles: Set<string>, optionalFiles: Set<string>): Promise<{prompt: string, files: string[]}> => {
     let prompt = `## User Request:\n${userPrompt}\n\n---\n`;
 
-    for (const file of inputFiles) {
-        prompt += await addFileContent(file);
-    }
+    const filePromises = [...inputFiles].map(addFileContent);
+    const inputFileContents = await Promise.all(filePromises);
+
+    prompt += inputFileContents.join('');
+
+    const files = [...inputFiles];
 
     for (const file of optionalFiles) {
         const filename = path.basename(file);
-        if (userPrompt.includes(filename)) {
+        if (userPrompt.includes(filename) && !inputFiles.has(file)) {
             prompt += await addFileContent(file);
+            files.push(file);
         }
     }
 
     prompt += `\n\n---\n## Instructions:\n${userPrompt}`;
 
-    return prompt;
+    return {prompt, files: [...new Set(files)]};
 };
 
 const main = async () => {
@@ -107,17 +112,17 @@ const main = async () => {
             exclude: [...(config.exclude || []), ...(options.exclude || [])]
         };
 
-        const inputFiles = readFiles(finalConfig.in!, finalConfig.exclude!, ig);
-        const optionalFiles = readFiles(finalConfig.optional!, finalConfig.exclude!, ig);
+        const inputFiles = new Set(await readFiles(finalConfig.in!, finalConfig.exclude!, ig));
+        const optionalFiles = new Set(await readFiles(finalConfig.optional!, finalConfig.exclude!, ig));
+
         const userPrompt = program.args.join(' ');
 
-        console.log("optionalFiles", inputFiles);
-        console.log("inputFiles", inputFiles);
-
-        const finalPrompt = await generatePrompt(userPrompt, inputFiles, optionalFiles);
+        const {prompt: finalPrompt, files} = await generatePrompt(userPrompt, inputFiles, optionalFiles);
 
         if (finalConfig.out) {
             await fs.writeFile(finalConfig.out, finalPrompt);
+            console.log("Included files:", files);
+            console.log("With user prompt:", userPrompt);
             console.log(`Prompt written to ${finalConfig.out}`);
         } else {
             console.log(finalPrompt);
